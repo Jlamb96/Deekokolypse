@@ -1,5 +1,7 @@
 # Deekokolypse
-A Roguelike Survival Apocalypse game where you must rebuild your car within 14 day 
+A Roguelike Survival Apocalypse game where you must rebuild your car within 14 day. 
+
+Programmed 100% in Python. Over 1200 lines. All written by me Jeremy Lamb
 
 You start off with no resources besides a random amount of cash and must use it to purchase from the trader which also has random supplies and restocks and must 
 also scavenge for supplies to build your car and protect yourself from the dangers of the post-apocalyptic world. I plan on making this more and more random each 
