@@ -7,6 +7,7 @@ from tkinter import messagebox
 from graphics import Scav_Camp
 from graphics import trader
 from status_check import color_changer
+from customtkinter import CTk, CTkButton, CTkFrame, CTkCanvas, CTkLabel, CTkFont, CTkCheckBox, CTkScrollbar, CTkComboBox, CTkTextbox, CTkScrollableFrame
 
 MAX_DAYS = 14
 STARTING_MONEY = random.randint(85, 150)
@@ -14,6 +15,8 @@ STARTING_HUNGER = 100
 STARTING_THIRST = 100
 STARTING_HEALTH = 100
 STARTING_ENERGY = 100
+Font_tuple = ("Helvetica", 30, "bold")
+Font_tuple_button = ("Helvetica", 40, "bold")
 STARTING_LOCATION = Scav_Camp
 pygame.mixer.init()
 
@@ -22,12 +25,17 @@ class GameStats:
     def __init__(self):
         # Define game variables
         self.trader_buy_list = None
-        self.window = Tk()
+        self.window = CTk(fg_color="black")
         self.window.iconbitmap("favicon.ico")
         self.window.title("Deekokolypse")
         self.color_change = color_changer()
         self.times_looted = 0
-        self.window.config(width=self.window.winfo_screenwidth(), height=self.window.winfo_screenheight(), bg="black")
+        self.height = self.window.winfo_screenheight()
+        self.window.columnconfigure(0, weight=1)
+        self.window.columnconfigure(1, weight=1)
+        self.window.columnconfigure(2, weight=1)
+        self.window.columnconfigure(3, weight=1)
+        self.window.columnconfigure(4, weight=1)
         self.days_left = MAX_DAYS
         self.money = STARTING_MONEY
         self.hunger = STARTING_HUNGER
@@ -46,59 +54,70 @@ class GameStats:
         self.drinks = []
         self.food = []
         self.meds = []
-        self.canvas_top = Canvas(self.window, bg="black", highlightthickness=0)
-        self.canvas_bottom = Canvas(self.window, bg="#113826", highlightthickness=0)
-        self.canvas_text = Canvas(self.window, bg="black", highlightthickness=0)
-        self.canvas_text.grid(row=0, column=0)
-        self.canvas_top.grid(row=0, column=1)
-        self.canvas_bottom.grid(row=1, column=0, columnspan=4)
-        self.health_number = Label(self.canvas_text, text=f"Health: {self.health}", fg="white", bg="black",
-                                   font='Helvetica 18 bold')
-        self.health_number.grid(column=0, row=0)
-        self.hunger_number = Label(self.canvas_text, text=f"Hunger: {self.hunger}", fg="white", bg="black",
-                                   font='Helvetica 18 bold')
-        self.hunger_number.grid(column=0, row=1)
-        self.ammo_have = Label(self.canvas_text, text=f"Ammo: {self.ammo}", fg="white", bg="black",
-                               font="Helvetica 18 bold")
-        self.ammo_have.grid(column=0, row=3, columnspan=1)
-        self.money_number = Label(self.canvas_text, text=f"Money: ${self.money}", fg="white", bg="black",
-                                  font='Helvetica 18 bold')
-        self.money_number.grid(column=1, row=3)
-        self.thirst_number = Label(self.canvas_text, text=f"Thirst: {self.thirst}", fg="white", bg="black",
-                                   font="Helvetica 18 bold")
-        self.thirst_number.grid(column=1, row=1)
-        self.energy_number = Label(self.canvas_text, text=f"Energy: {self.energy}", fg="white", bg="black",
-                                   font='Helvetica 18 bold')
-        self.energy_number.grid(column=1, row=0)
-        self.days_number = Label(self.canvas_text, text=f"Days Left: {self.days_left}", fg="red", bg="black",
-                                 font='Helvetica 24 bold')
+        if self.height < 800:
+            self.canvas_bottom = CTkScrollableFrame(self.window, border_color="White", fg_color="#113826", border_width=3, corner_radius=0, orientation="vertical")
+            self.canvas_bottom.grid(row=1, column=0, columnspan=3, sticky="nswe")
+
+        else:
+            self.canvas_bottom = CTkFrame(self.window, border_color="White", fg_color="#113826", border_width=3)
+            self.canvas_bottom.grid(row=1, column=1, sticky='')
+            self.canvas_bottom.grid_columnconfigure(0, weight=1)
+        self.canvas_top = CTkFrame(self.window, border_color="White", border_width=4, fg_color="#245953")
+        self.canvas_text = CTkFrame(self.window, fg_color="#2D2727", border_width=4, border_color="White")
+        self.canvas_text_middle = CTkFrame(self.window, fg_color="black", border_width=2, border_color="red")
+
+
+
+        self.canvas_text.grid(row=0, column=0, sticky='')
+        self.canvas_top.grid(row=0, column=2, padx=(50, 0), pady=(0, 50), sticky='e')
+        self.canvas_text_middle.grid(row=0, column=1, sticky='')
+        self.health_number = CTkLabel(self.canvas_text, text=f"Health: {self.health}",
+                                   font=Font_tuple)
+        self.health_number.grid(column=0, row=0, padx=(15,0), pady=26, sticky='')
+        self.hunger_number = CTkLabel(self.canvas_text, text=f"Hunger: {self.hunger}",
+                                   font=Font_tuple)
+        self.hunger_number.grid(column=0, row=1, padx=(15,0), pady=26, sticky='')
+        self.ammo_have = CTkLabel(self.canvas_text, text=f"Ammo: {self.ammo}",
+                               font=Font_tuple)
+        self.ammo_have.grid(column=0, row=3, columnspan=1, pady=26, sticky='')
+        self.money_number = CTkLabel(self.canvas_text, text=f"Money: ${self.money}",
+                                  font=Font_tuple)
+        self.money_number.grid(column=1, row=3, padx=15, pady=26, sticky='')
+        self.thirst_number = CTkLabel(self.canvas_text, text=f"Thirst: {self.thirst}",
+                                   font=Font_tuple)
+        self.thirst_number.grid(column=1, row=1, padx=15, pady=26)
+        self.energy_number = CTkLabel(self.canvas_text, text=f"Energy: {self.energy}",
+                                   font=Font_tuple)
+        self.energy_number.grid(column=1, row=0, padx=15, pady=26)
+        self.days_number = CTkLabel(self.canvas_text_middle, text=f"Days Left: {self.days_left}",
+                                 font=Font_tuple)
         self.days_number.grid(column=3, row=0, pady=(0, 120), padx=25)
-        self.current_location = Label(self.canvas_top, text=f"Current Location:", fg="red", bg="black",
-                                      font='Helvetica 12 bold')
-        self.current_location.grid(column=0, row=2)
-        self.location_pic = Label(self.canvas_top, text=self.location_player, fg="red", bg="black",
+        self.current_location = CTkLabel(self.canvas_top, text=f"Current Location:",
+                                      font=("Helvetica", 25, "bold"))
+        self.current_location.grid(column=1, row=6, padx=10)
+        self.location_pic = CTkLabel(self.canvas_top, text=self.location_player,
                                   font=("Courier", 10))
-        self.location_pic.grid(column=0, row=3, pady=30, padx=30)
+        self.location_pic.grid(column=1, row=5, pady=30, padx=30)
         self.checked_state = IntVar()
-        self.mute_button = Checkbutton(self.canvas_top, text="Mute Sound?", variable=self.checked_state,
+        self.mute_button = CTkCheckBox(self.canvas_top, text="Mute Sound?", variable=self.checked_state,
                                        command=self.play)
-        self.mute_button.grid(column=1, row=3)
+        self.mute_button.grid(column=1, row=3, pady=(10, 0))
         if len(self.tools) == 0:
-            self.tools_owned = Label(self.canvas_top, text=f"Tools: None", fg="white", bg="black",
-                                 font="Helvetica 18 bold")
+            self.tools_owned = CTkLabel(self.canvas_top, text=f"Tools: None",
+                                 font=("Helvetica", 20, "bold"))
         else:
             tools_formatted = str(self.tools)
             tools_formatted = tools_formatted.replace('[', '').replace(']', '').replace("'", "")
-            self.tools_owned = Label(self.canvas_top, text=f"Tools: {tools_formatted}", fg="white", bg="black",
-                                     font="Helvetica 18 bold")
-        self.tools_owned.grid(column=0, row=5)
+            self.tools_owned = CTkLabel(self.canvas_top, text=f"Tools: {tools_formatted}",
+                                     font=("Helvetica", 20, "bold"), wraplength=400)
+        self.tools_owned.grid(column=1, row=7, pady=20, padx=10)
         if len(self.car_parts) == 0:
-            self.car_parts_text = Label(self.canvas_top, text=f"Car Parts: None", fg="white", bg="black",
-                                        font="Helvetica 18 bold")
+            self.car_parts_text = CTkLabel(self.canvas_top, text=f"Car Parts: None",
+                                        font=("Helvetica", 20, "bold"))
         else:
-            self.car_parts_text = Label(self.canvas_top, text=f"Car Parts: {self.car_parts}", fg="white", bg="black",
-                                        font='Helvetica 18 bold')
-        self.car_parts_text.grid(column=0, row=4)
+            self.car_parts_text = CTkLabel(self.canvas_top, text=f"Car Parts: {self.car_parts}",
+                                        font=("Helvetica", 20, "bold"), wraplength=400)
+        self.car_parts_text.grid(column=1, row=9, padx=10, pady=(0, 10))
 
         self.TOOLS = ["Wrench", "Hammer", "Screwdriver", "Pliers"]
         self.TOOLS2 = ["Wrench", "Hammer", "Screwdriver", "Pliers"]
@@ -205,23 +224,22 @@ class GameStats:
 
         GameStats.create_middle_buttons(self)
         if len(self.weapons) == 0:
-            self.weapons_number = Label(self.canvas_top, text=f"Weapons: None", fg="white", bg="black",
-                                        font='Helvetica 18 bold')
-            self.weapons_number.grid(column=0, row=6)
+            self.weapons_number = CTkLabel(self.canvas_top, text=f"Weapons: None",
+                                        font=("Helvetica", 20, "bold"))
         else:
             weapons_formatted = str(self.weapons)
             weapons_formatted = weapons_formatted.replace('[', '').replace(']', '').replace("'", "")
-            self.weapons_number = Label(self.canvas_top, text=f"Weapons: {weapons_formatted}", fg="white", bg="black",
-                                        font='Helvetica 18 bold')
-            self.weapons_number.grid(column=0, row=6)
-        self.drinks_text = Label(self.canvas_text, text=f"Drinks: {len(self.drinks)}", fg="white", bg="black",
-                                 font="Helvetica 18 bold")
+            self.weapons_number = CTkLabel(self.canvas_top, text=f"Weapons: {weapons_formatted}",
+                                        font=("Helvetica", 20, "bold"))
+        self.weapons_number.grid(column=1, row=8)
+        self.drinks_text = CTkLabel(self.canvas_text_middle, text=f"Drinks: {len(self.drinks)}",
+                                 font=Font_tuple)
         self.drinks_text.grid(column=3, row=1)
-        self.food_text = Label(self.canvas_text, text=f"Food: {len(self.food)}", fg="white", bg="black",
-                               font="Helvetica 18 bold")
+        self.food_text = CTkLabel(self.canvas_text_middle, text=f"Food: {len(self.food)}",
+                               font=Font_tuple)
         self.food_text.grid(column=3, row=2)
-        self.meds_text = Label(self.canvas_text, text=f"Meds: {len(self.meds)}", fg="white", bg="black",
-                               font="Helvetica 18 bold")
+        self.meds_text = CTkLabel(self.canvas_text_middle, text=f"Meds: {len(self.meds)}",
+                               font=Font_tuple)
         self.meds_text.grid(column=3, row=3)
         self.random_trader_loot()
         self.window.mainloop()
@@ -255,9 +273,8 @@ class GameStats:
         except:
             None
         self.food_eaten = (self.food_list.get(self.food_list.curselection()))
-        self.eat_confirm_button = Button(self.canvas_bottom, text=f"Eat {self.food_eaten}?", command=self.eat_food,
-                                         font=18)
-        self.eat_confirm_button.grid(column=1, row=2)
+        self.eat_confirm_button = CTkButton(self.canvas_bottom, text=f"Eat {self.food_eaten}?", command=self.eat_food, font=Font_tuple)
+        self.eat_confirm_button.grid(column=1, row=2, pady=20, padx=20)
 
     def eat_food(self):
         self.no_health_loss = True
@@ -275,6 +292,7 @@ class GameStats:
         GameStats.update_text(self)
         self.eat_confirm_button.destroy()
         self.consume_menu.destroy()
+        self.scrollbar.destroy()
         self.game_over()
         GameStats.create_middle_buttons(self)
 
@@ -283,15 +301,19 @@ class GameStats:
             messagebox.showinfo("No food", "You have no food")
         else:
             GameStats.delete_buttons(self)
-            self.consume_menu = Button(self.canvas_bottom, text="Exit", command=self.exit_eat_drink, font=18)
-            self.consume_menu.grid(column=1, row=1)
-            self.food_list = Listbox(self.canvas_bottom, height=(len(self.food)), width=20, font=60, bg="black",
+            self.consume_menu = CTkButton(self.canvas_bottom, text="Exit", command=self.exit_eat_drink, font=Font_tuple)
+            self.consume_menu.grid(column=1, row=1, pady=(0, 10))
+            self.food_list = Listbox(self.canvas_bottom, height=6, width=20, font=("Arial", 20), bg="black",
                                      fg="white", highlightthickness=0)
+            self.scrollbar = CTkScrollbar(self.canvas_bottom)
+            self.scrollbar.grid(column=4, row=0, padx=5)
+            self.scrollbar.configure(command=self.food_list.yview)
             for food_item in self.food:
                 if food_item in self.food:
                     self.food_list.insert(self.food.index(food_item), food_item)
                     self.food_list.bind("<<ListboxSelect>>", self.listbox_used_food)
-                    self.food_list.grid(column=1, row=0)
+                    self.food_list.grid(column=1, row=0, pady=20, padx=10)
+                    self.food_list.configure(yscrollcommand=self.scrollbar.set)
 
     def exit_eat_drink(self):
         try:
@@ -319,6 +341,7 @@ class GameStats:
             self.med_confirm_button.destroy()
         except:
             None
+        self.scrollbar.destroy()
         GameStats.create_middle_buttons(self)
 
     def listbox_used_drink(self, event):
@@ -329,9 +352,9 @@ class GameStats:
             None
         finally:
             self.drink_consumed = (self.drink_box.get(self.drink_box.curselection()))
-            self.drink_confirm_button = Button(self.canvas_bottom, text=f"Drink {self.drink_consumed}?",
-                                               command=self.drink_liquid, font=18)
-            self.drink_confirm_button.grid(column=1, row=2)
+            self.drink_confirm_button = CTkButton(self.canvas_bottom, text=f"Drink {self.drink_consumed}?",
+                                               command=self.drink_liquid, font=Font_tuple)
+            self.drink_confirm_button.grid(column=1, row=2, pady=20, padx=20)
 
     def drink_liquid(self):
         self.no_health_loss = True
@@ -352,6 +375,7 @@ class GameStats:
                 self.thirst = 100
             GameStats.update_text(self)
             GameStats.create_middle_buttons(self)
+            self.scrollbar.destroy()
             self.drink_confirm_button.destroy()
             self.consume_menu.destroy()
 
@@ -363,15 +387,19 @@ class GameStats:
             messagebox.showinfo("No Drinks", "You have no Drinks")
         else:
             GameStats.delete_buttons(self)
-            self.consume_menu = Button(self.canvas_bottom, text="Exit", command=self.exit_eat_drink, font=18)
-            self.consume_menu.grid(column=1, row=1)
-            self.drink_box = Listbox(self.canvas_bottom, height=(len(self.drinks)), width=20, font=60, bg="black",
+            self.consume_menu = CTkButton(self.canvas_bottom, text="Exit", command=self.exit_eat_drink, font=Font_tuple)
+            self.consume_menu.grid(column=1, row=1, pady=(0, 10))
+            self.drink_box = Listbox(self.canvas_bottom, height=6, width=20, font=("Arial", 20), bg="black",
                                      fg="white", highlightthickness=0)
+            self.scrollbar = CTkScrollbar(self.canvas_bottom)
+            self.scrollbar.grid(column=4, row=0, padx=5)
+            self.scrollbar.configure(command=self.drink_box.yview)
             for drink_item in self.drinks:
                 if drink_item in self.drinks:
                     self.drink_box.insert(self.drinks.index(drink_item), drink_item)
                     self.drink_box.bind("<<ListboxSelect>>", self.listbox_used_drink)
-                    self.drink_box.grid(column=1, row=0)
+                    self.drink_box.grid(column=1, row=0, pady=20, padx=10)
+                    self.drink_box.configure(yscrollcommand=self.scrollbar.set)
 
     def listbox_used_meds(self, event):
         # Gets current selection from listbox
@@ -381,9 +409,9 @@ class GameStats:
             None
         finally:
             self.med_consumed = (self.med_box.get(self.med_box.curselection()))
-            self.med_confirm_button = Button(self.canvas_bottom, text=f"Use {self.med_consumed}?",
-                                             command=self.use_meds, font=18)
-            self.med_confirm_button.grid(column=1, row=2)
+            self.med_confirm_button = CTkButton(self.canvas_bottom, text=f"Use {self.med_consumed}?",
+                                             command=self.use_meds, font=Font_tuple)
+            self.med_confirm_button.grid(column=1, row=2, pady=20, padx=20)
 
     def use_meds(self):
         self.no_health_loss = True
@@ -399,6 +427,7 @@ class GameStats:
         GameStats.update_text(self)
         GameStats.create_middle_buttons(self)
         self.med_confirm_button.destroy()
+        self.scrollbar.destroy()
         self.consume_menu.destroy()
         self.med_box.destroy()
 
@@ -407,15 +436,19 @@ class GameStats:
             messagebox.showinfo("No Meds", "You have no Meds")
         else:
             GameStats.delete_buttons(self)
-            self.consume_menu = Button(self.canvas_bottom, text="Exit", command=self.exit_eat_drink, font=18)
-            self.consume_menu.grid(column=1, row=1)
-            self.med_box = Listbox(self.canvas_bottom, height=(len(self.meds)), width=20, font=60, bg="black",
+            self.consume_menu = CTkButton(self.canvas_bottom, text="Exit", command=self.exit_eat_drink, font=Font_tuple)
+            self.consume_menu.grid(column=1, row=1, pady=(0, 10))
+            self.med_box = Listbox(self.canvas_bottom, height=4, width=20, font=("Arial", 20), bg="black",
                                    fg="white", highlightthickness=0)
+            self.scrollbar = CTkScrollbar(self.canvas_bottom)
+            self.scrollbar.grid(column=4, row=0, padx=5)
+            self.scrollbar.configure(command=self.med_box.yview)
             for med_item in self.meds:
                 if med_item in self.meds:
                     self.med_box.insert(self.meds.index(med_item), med_item)
                     self.med_box.bind("<<ListboxSelect>>", self.listbox_used_meds)
-                    self.med_box.grid(column=1, row=0)
+                    self.med_box.grid(column=1, row=0, pady=20, padx=10)
+                    self.med_box.configure(yscrollcommand=self.scrollbar.set)
 
     def end_day(self):
         self.no_health_loss = False
@@ -456,34 +489,34 @@ class GameStats:
             GameStats.delete_buttons(self)
             GameStats.create_center_window(self)
             self.no_health_loss = True
-            button = Button(self.trader_window, text="Exit Trader", command=self.close_trader, font=18)
-            button.grid(column=2, row=1)
+            button = CTkButton(self.trader_window, text="Exit Trader", command=self.close_trader, font=Font_tuple)
+            button.grid(column=2, row=1, pady=(0, 10))
             trader_image = Label(self.trader_window, text=trader, font=("Courier", 4), fg="green", bg="black")
-            trader_image.grid(column=2, row=0)
-            trader_text = Label(self.trader_window, text="Buy", font=("Courier", 14), fg="green", bg="black")
+            trader_image.grid(column=2, row=0, pady=(15,50), padx=20)
+            trader_text = CTkLabel(self.trader_window, text="Buy", font=("Courier", 25))
             trader_text.grid(column=3, row=1)
             if len(self.food) + len(self.drinks) + len(self.meds) + len(self.car_parts) + len(self.tools) > 0:
-                trader_text2 = Label(self.trader_window, text="Sell", font=("Courier", 14), fg="green", bg="black")
+                trader_text2 = CTkLabel(self.trader_window, text="Sell", font=("Courier", 25))
                 trader_text2.grid(column=1, row=1)
             self.create_trader_buybox()
             self.create_trader_sellbox()
 
 
     def create_trader_buybox(self):
-        self.buy_box = Listbox(self.trader_window, height=8, width=20, font=10, bg="black",
+        self.buy_box = Listbox(self.trader_window, height=8, width=20, font=("Courier", 14), bg="black",
                                fg="white", highlightthickness=0)
-        scrollbar = Scrollbar(self.trader_window)
-        scrollbar.grid(column=4, row=0)
-        scrollbar.config(command=self.buy_box.yview)
+        scrollbar = CTkScrollbar(self.trader_window)
+        scrollbar.grid(column=4, row=0, padx=5)
+        scrollbar.configure(command=self.buy_box.yview)
         for item in self.trader_buy_list:
             self.buy_box.insert(self.trader_buy_list.index(item), item)
             self.buy_box.bind("<<ListboxSelect>>", self.listbox_bought_item)
             self.buy_box.grid(column=3, row=0)
-            self.buy_box.config(yscrollcommand=scrollbar.set)
+            self.buy_box.configure(yscrollcommand=scrollbar.set)
 
     def create_trader_sellbox(self):
         self.player_sell = []
-        self.sell_box = Listbox(self.trader_window, height=8 , width=20, font=10, bg="black",fg="white", highlightthickness=0)
+        self.sell_box = Listbox(self.trader_window, height=8, width=20, font=("Courier", 14), bg="black",fg="white", highlightthickness=0)
         if self.ammo >= 10:
             self.player_sell.append("Ammo")
         for item in self.food:
@@ -501,11 +534,11 @@ class GameStats:
             self.sell_box.bind("<<ListboxSelect>>", self.listbox_sold_item)
             self.sell_box.grid(column=1, row=0)
         if len(self.player_sell) >= 1:
-            scrollbar1 = Scrollbar(self.trader_window)
-            scrollbar1.grid(column=0, row=0)
-            scrollbar1.config(command=self.sell_box.yview)
+            scrollbar1 = CTkScrollbar(self.trader_window)
+            scrollbar1.grid(column=0, row=0, padx=5)
+            scrollbar1.configure(command=self.sell_box.yview)
         try:
-            self.sell_box.config(yscrollcommand=scrollbar1.set)
+            self.sell_box.configure(yscrollcommand=scrollbar1.set)
         except:
             None
 
@@ -518,7 +551,8 @@ class GameStats:
             None
         finally:
             self.sold_item = (self.sell_box.get(self.sell_box.curselection()))
-            self.sell_confirm_button = Button(self.trader_window, text=f"Sell {self.sold_item} for ${round(self.MASTER_LIST[self.sold_item] // 2)}?", command=self.sell_item, font=10)
+            self.sell_confirm_button = CTkButton(self.trader_window, text=f"Sell {self.sold_item} for ${round(self.MASTER_LIST[self.sold_item] // 2)}?",
+                                                 command=self.sell_item, font=("Helvetica", 20, "bold"))
             self.sell_confirm_button.grid(column=1, row=1)
 
     def sell_item(self):
@@ -551,8 +585,8 @@ class GameStats:
             None
         finally:
             self.bought_item = (self.buy_box.get(self.buy_box.curselection()))
-            self.buy_confirm_button = Button(self.trader_window, text=f"Buy {self.bought_item} for ${self.MASTER_LIST[self.bought_item]}?", command=self.buy_item,
-                                             font=10)
+            self.buy_confirm_button = CTkButton(self.trader_window, text=f"Buy {self.bought_item} for ${self.MASTER_LIST[self.bought_item]}?", command=self.buy_item,
+                                             font=("Helvetica", 20, "bold"))
             self.buy_confirm_button.grid(column=3, row=1)
 
     def buy_item(self):
@@ -592,38 +626,38 @@ class GameStats:
             self.no_health_loss = True
             self.update_text()
         self.no_health_loss = False
-        self.next_day_button = Button(self.canvas_bottom, text="Next Day", command=self.end_day,
-                                      font=('Helvetica 20 bold'))
+        self.next_day_button = CTkButton(self.canvas_bottom, text="Next Day", command=self.end_day,
+                                      font=Font_tuple_button, width=100, fg_color="#AA5656")
         self.next_day_button.grid(column=1, row=1, padx=50, pady=50)
-        self.version_label = Label(self.canvas_bottom, text="Version 0.8.9.2\nDeeksoft ©2023 ", fg="red", bg="black",
-                                   font=("Courier", 10))
+        self.version_label = CTkLabel(self.canvas_bottom, text="Version 0.8.9.3\nDeeksoft ©2023 ", fg_color="#113826", text_color="Black",
+                                   font=("Courier", 15, "bold"))
         self.version_label.grid(column=2, row=4)
         if self.times_looted < 3:
-            self.scavenge_button = Button(self.canvas_bottom, text="Scavenge", font=('Helvetica 19 bold'), width=15,
+            self.scavenge_button = CTkButton(self.canvas_bottom, text="Scavenge", font=Font_tuple_button, width=175,
                                           command=self.scavenge)
-            self.scavenge_button.grid(column=2, row=3)
-        self.eat_button = Button(self.canvas_bottom, text="Eat", font=('Helvetica 19 bold'), width=15,
+            self.scavenge_button.grid(column=2, row=3, pady=10, padx=10)
+        self.eat_button = CTkButton(self.canvas_bottom, text="Eat", font=Font_tuple_button, width=195,
                                  command=self.food_buttons)
-        self.eat_button.grid(column=0, row=2)
-        self.drink_button = Button(self.canvas_bottom, text="Drink", font=('Helvetica 19 bold'), width=15,
-                                   command=self.drink_buttons)
-        self.drink_button.grid(column=0, row=3)
+        self.eat_button.grid(column=0, row=2, pady=10, padx=10)
+        self.drink_button = CTkButton(self.canvas_bottom, text="Drink", width=195,
+                                   command=self.drink_buttons, font=Font_tuple_button)
+        self.drink_button.grid(column=0, row=3, pady=10, padx=10)
         if self.location_player == graphics.Scav_Camp:
-            self.trader_button = Button(self.canvas_bottom, text="Visit Trader", font=('Helvetica 19 bold'), width=15,
+            self.trader_button = CTkButton(self.canvas_bottom, text="Visit Trader", font=Font_tuple_button, width=195,
                                         command=self.trader)
-            self.trader_button.grid(column=1, row=2)
-        self.travel_button = Button(self.canvas_bottom, text="Travel", font=('Helvetica 19 bold'), width=15,
+            self.trader_button.grid(column=1, row=2, pady=10)
+        self.travel_button = CTkButton(self.canvas_bottom, text="Travel", font=Font_tuple_button, width=195,
                                     command=self.travel)
-        self.travel_button.grid(column=2, row=2)
-        self.heal_button = Button(self.canvas_bottom, text="Heal", font=('Helvetica 19 bold'), width=15,
+        self.travel_button.grid(column=2, row=2, pady=10, padx=10)
+        self.heal_button = CTkButton(self.canvas_bottom, text="Heal", font=Font_tuple_button, width=195,
                                   command=self.med_buttons)
-        self.heal_button.grid(column=1, row=4)
+        self.heal_button.grid(column=1, row=4, pady=15)
         if self.location_player == graphics.start_logo:
-            self.repair_car_button = Button(self.canvas_bottom, text="Repair car", font=('Helvetica 19 bold'), width=15,
+            self.repair_car_button = CTkButton(self.canvas_bottom, text="Repair car", font=Font_tuple_button, width=15,
                                             command=self.repair_car)
-            self.repair_car_button.grid(column=1, row=3)
-            self.diagnose_car_button = Button(self.canvas_bottom, text="Diagnose Car", font=('Helvetica 19 bold'), width=15, command=self.diagnose_car)
-            self.diagnose_car_button.grid(column=1, row=2)
+            self.repair_car_button.grid(column=1, row=3, pady=10)
+            self.diagnose_car_button = CTkButton(self.canvas_bottom, text="Diagnose Car", font=Font_tuple_button, width=15, command=self.diagnose_car)
+            self.diagnose_car_button.grid(column=1, row=2, pady=10)
 
     def delete_buttons(self):
         self.trader_button.destroy()
@@ -642,8 +676,11 @@ class GameStats:
                 None
 
     def create_center_window(self):
-        self.trader_window = Frame(self.canvas_bottom, bg="#113826")
-        self.trader_window.grid(column=0, row=0)
+        self.trader_window = CTkFrame(self.canvas_bottom, border_width=2, border_color="white")
+        self.trader_window.grid(column=0, row=0, sticky='nwse', columnspan=4)
+
+
+
 
     def check_dirty_water_inventory(self):
         if self.location_player != graphics.forest:
@@ -655,41 +692,39 @@ class GameStats:
     def travel(self):
         GameStats.delete_buttons(self)
         GameStats.create_center_window(self)
-        self.button = Button(self.trader_window, text="Exit Travel", command=self.close_trader, font=22)
+        self.button = CTkButton(self.trader_window, text="Exit Travel", command=self.close_trader, font=Font_tuple)
         self.button.grid(column=2, row=0)
-        self.big_city_button = Button(self.trader_window, text=graphics.big_city, command=self.big_city,
-                                      font=("Courier", 6), fg="green", bg="black")
-        self.big_city_button.grid(column=0, row=1)
-        self.forest_button = Button(self.trader_window, text=graphics.forest, command=self.forest, font=("Courier", 6),
-                                    fg="green", bg="black", width=75, height=20)
+        self.big_city_button = CTkButton(self.trader_window, text=graphics.big_city, command=self.big_city,
+                                      font=("Courier", 6),  height=150, width=350, fg_color="Black")
+        self.big_city_button.grid(column=2, row=2)
+        self.forest_button = CTkButton(self.trader_window, text=graphics.forest, command=self.forest, font=("Courier", 8) , height=150, width=350, fg_color="Black")
         self.forest_button.grid(column=1, row=1)
-        self.garage_button = Button(self.trader_window, text=graphics.start_logo, command=self.garage,
-                                    font=("Courier", 5), fg="green", bg="black", width=88)
+        self.garage_button = CTkButton(self.trader_window, text=graphics.start_logo, command=self.garage,
+                                    font=("Courier", 5),  height=150, width=350, fg_color="Black")
         self.garage_button.grid(column=0, row=2)
-        self.scav_town_button = Button(self.trader_window, text=graphics.Scav_Camp, command=self.scav_town,
-                                       font=("Courier", 7), fg="green", bg="black", width=75, height=13)
+        self.scav_town_button = CTkButton(self.trader_window, text=graphics.Scav_Camp, command=self.scav_town,
+                                       font=("Courier", 9), height=150, width=350, fg_color="Black")
         self.scav_town_button.grid(column=1, row=2)
-        travel_text = Label(self.trader_window, text="Where do you want to travel?", font=("Courier", 20), fg="white",
-                            bg="black")
+        travel_text = Label(self.trader_window, text="Where do you want to travel?", font=("Courier", 20))
         travel_text.grid(column=1, row=0, pady=15)
-        self.junk_yard_button = Button(self.trader_window, text=graphics.junkyard, command=self.junk_yard,
-                                       font=("Courier", 5), fg="green", bg="black", width=84, height=20)
-        self.junk_yard_button.grid(column=2, row=2)
-        self.hospital_button = Button(self.trader_window, text=graphics.hospital, command=self.hospital,
-                                      font=("Courier", 5), fg="green", bg="black", width=84, height=20)
+        self.junk_yard_button = CTkButton(self.trader_window, text=graphics.junkyard, command=self.junk_yard,
+                                       font=("Courier", 5),  height=150, width=465, fg_color="Black")
+        self.junk_yard_button.grid(column=0, row=1)
+        self.hospital_button = CTkButton(self.trader_window, text=graphics.hospital, command=self.hospital,
+                                      font=("Courier", 5), height=150, width=350, fg_color="Black")
         self.hospital_button.grid(column=2, row=1)
         if self.location_player == graphics.big_city:
-            self.big_city_button.config(fg="red")
+            self.big_city_button.configure(text_color="red")
         elif self.location_player == graphics.Scav_Camp:
-            self.scav_town_button.config(fg="red")
+            self.scav_town_button.configure(text_color="red")
         elif self.location_player == graphics.hospital:
-            self.hospital_button.config(fg="red")
+            self.hospital_button.configure(text_color="red")
         elif self.location_player == graphics.forest:
-            self.forest_button.config(fg="red")
+            self.forest_button.configure(text_color="red")
         elif self.location_player == graphics.junkyard:
-            self.junk_yard_button.config(fg="red")
+            self.junk_yard_button.configure(text_color="red")
         elif self.location_player == graphics.start_logo:
-            self.garage_button.config(fg="red")
+            self.garage_button.configure(text_color="red")
         self.LOCATIONS = [self.big_city_button, self.forest_button, self.garage_button, self.scav_town_button,
                           self.junk_yard_button, self.hospital_button]
 
@@ -701,9 +736,9 @@ class GameStats:
                 self.drinks.append("Dirty Water")
             GameStats.reset_color_green(self)
             self.times_looted = 0
-            self.forest_button.config(fg="red")
+            self.forest_button.configure(text_color="red")
             self.location_player = graphics.forest
-            self.location_pic.config(text=self.location_player, font=("Courier", 8))
+            self.location_pic.configure(text=self.location_player, font=("Courier", 9))
             self.energy -= random.randint(10, 25)
             self.thirst -= random.randint(10, 20)
             self.hunger -= random.randint(10, 20)
@@ -716,9 +751,9 @@ class GameStats:
         else:
             GameStats.reset_color_green(self)
             self.times_looted = 0
-            self.big_city_button.config(fg="red")
+            self.big_city_button.configure(text_color="red")
             self.location_player = graphics.big_city
-            self.location_pic.config(text=self.location_player, font=("Courier", 5))
+            self.location_pic.configure(text=self.location_player, font=("Courier", 6))
             self.energy -= random.randint(10, 25)
             self.thirst -= random.randint(10, 20)
             self.hunger -= random.randint(10, 20)
@@ -733,9 +768,9 @@ class GameStats:
         else:
             GameStats.reset_color_green(self)
             self.times_looted = 0
-            self.garage_button.config(fg="red")
+            self.garage_button.configure(text_color="red")
             self.location_player = graphics.start_logo
-            self.location_pic.config(text=self.location_player, font=("Courier", 4))
+            self.location_pic.configure(text=self.location_player, font=("Courier", 5))
             self.energy -= random.randint(10, 25)
             self.thirst -= random.randint(10, 20)
             self.hunger -= random.randint(10, 20)
@@ -748,9 +783,9 @@ class GameStats:
         else:
             GameStats.reset_color_green(self)
             self.times_looted = 0
-            self.scav_town_button.config(fg="red")
+            self.scav_town_button.configure(text_color="red")
             self.location_player = graphics.Scav_Camp
-            self.location_pic.config(text=self.location_player, font=("Courier", 10))
+            self.location_pic.configure(text=self.location_player, font=("Courier", 10))
             self.energy -= random.randint(10, 25)
             self.thirst -= random.randint(10, 20)
             self.hunger -= random.randint(10, 20)
@@ -763,9 +798,9 @@ class GameStats:
         else:
             GameStats.reset_color_green(self)
             self.times_looted = 0
-            self.junk_yard_button.config(fg="red")
+            self.junk_yard_button.configure(text_color="red")
             self.location_player = graphics.junkyard
-            self.location_pic.config(text=self.location_player, font=("Courier", 5))
+            self.location_pic.configure(text=self.location_player, font=("Courier", 5))
             self.energy -= random.randint(10, 25)
             self.thirst -= random.randint(10, 20)
             self.hunger -= random.randint(10, 20)
@@ -778,9 +813,9 @@ class GameStats:
         else:
             GameStats.reset_color_green(self)
             self.times_looted = 0
-            self.hospital_button.config(fg="red")
+            self.hospital_button.configure(text_color="red")
             self.location_player = graphics.hospital
-            self.location_pic.config(text=self.location_player, font=("Courier", 5))
+            self.location_pic.configure(text=self.location_player, font=("Courier", 5))
             self.energy -= random.randint(10, 25)
             self.thirst -= random.randint(10, 20)
             self.hunger -= random.randint(10, 20)
@@ -795,7 +830,7 @@ class GameStats:
                                                          "deployed nearby. Excited at the prospect of finding useful supplies,\n"
                                                          " you head towards the location of the air drop, only to find that you are not alone.", fg="white", bg="black", font=('Helvetica 18 bold'))
         self.test_event.grid(column=0, row=0, pady=20, padx=20)
-        button = Button(self.trader_window, text="Exit", command=self.close_trader, font=18)
+        button = CTkButton(self.trader_window, text="Exit", command=self.close_trader, font=Font_tuple)
         button.grid(column=0, row=2)
         self.test_info = Label(self.trader_window, text="This is a test event. It is not finished yet, Just exit", fg="red", bg="black", font=("Courier", 14))
         self.test_info.grid(column=0, row=1)
@@ -812,7 +847,7 @@ class GameStats:
 
     def reset_color_green(self):
         for location in self.LOCATIONS:
-            location.config(fg="green")
+            location.configure(text_color="green")
 
     def scavenge(self):
         self.times_looted += 1
@@ -830,14 +865,14 @@ class GameStats:
                     random_loot = random.choice(self.DRINKS)
                     self.drinks.append(random_loot)
                     loot.append(random_loot)
-                self.drinks_text.config(text=f"Drinks: {len(self.drinks)}")
+                self.drinks_text.configure(text=f"Drinks: {len(self.drinks)}")
             elif 25 < things_looted < 50:
                 food_looted = (random.randint(1, 2))
                 for _ in range(0, food_looted):
                     random_loot = random.choice(self.FOOD)
                     self.food.append(random_loot)
                     loot.append(random_loot)
-                self.food_text.config(text=f"Food: {len(self.food)}")
+                self.food_text.configure(text=f"Food: {len(self.food)}")
             elif 50 <= things_looted < 70:
                 loot = self.random_food_drink(2, 2)
             elif 70 <= things_looted < 87:
@@ -859,14 +894,14 @@ class GameStats:
                     random_loot = random.choice(self.DRINKS)
                     self.drinks.append(random_loot)
                     loot.append(random_loot)
-                self.drinks_text.config(text=f"Drinks: {len(self.drinks)}")
+                self.drinks_text.configure(text=f"Drinks: {len(self.drinks)}")
             elif 25 < things_looted < 50:
                 food_looted = (random.randint(1, 2))
                 for _ in range(0, food_looted):
                     random_loot = random.choice(self.FOOD)
                     self.food.append(random_loot)
                     loot.append(random_loot)
-                self.food_text.config(text=f"Food: {len(self.food)}")
+                self.food_text.configure(text=f"Food: {len(self.food)}")
             elif 50 <= things_looted < 60:
                 loot = random.choice(self.TOOLS)
                 self.tools.append(loot)
@@ -890,14 +925,14 @@ class GameStats:
                     random_loot = random.choice(self.DRINKS)
                     self.drinks.append(random_loot)
                     loot.append(random_loot)
-                self.drinks_text.config(text=f"Drinks: {len(self.drinks)}")
+                self.drinks_text.configure(text=f"Drinks: {len(self.drinks)}")
             elif 25 < things_looted < 50:
                 food_looted = (random.randint(1, 2))
                 for _ in range(0, food_looted):
                     random_loot = random.choice(self.FOOD)
                     self.food.append(random_loot)
                     loot.append(random_loot)
-                self.food_text.config(text=f"Food: {len(self.food)}")
+                self.food_text.configure(text=f"Food: {len(self.food)}")
             elif 50 <= things_looted < 75:
                 loot = random.choice(self.TOOLS)
                 self.tools.append(loot)
@@ -922,14 +957,14 @@ class GameStats:
                     random_loot = random.choice(self.DRINKS)
                     self.drinks.append(random_loot)
                     loot.append(random_loot)
-                self.drinks_text.config(text=f"Drinks: { len(self.drinks)}")
+                self.drinks_text.configure(text=f"Drinks: { len(self.drinks)}")
             elif 30 < things_looted < 60:
                 food_looted = (random.randint(1, 2))
                 for _ in range(0, food_looted):
                     random_loot = random.choice(self.FOOD_FOREST)
                     self.food.append(random_loot)
                     loot.append(random_loot)
-                self.food_text.config(text=f"Food: {len(self.food)}")
+                self.food_text.configure(text=f"Food: {len(self.food)}")
             elif 60 <= things_looted <= 90:
                 loot = self.random_food_drink(2, 2)
             elif 91 <= things_looted <= 120:
@@ -937,20 +972,20 @@ class GameStats:
 
         elif self.location_player == graphics.hospital:
             things_looted = random.randint(1, 100)
-            if things_looted <= 20:
+            if things_looted <= 25:
                 drink_looted = random.randint(1, 3)
                 for _ in range(0, drink_looted):
                     random_loot = random.choice(self.DRINKS)
                     self.drinks.append(random_loot)
                     loot.append(random_loot)
-                self.drinks_text.config(text=f"Drinks: {len(self.drinks)}")
+                self.drinks_text.configure(text=f"Drinks: {len(self.drinks)}")
             elif 25 < things_looted < 50:
                 meds_looted = (random.randint(1, 3))
                 for _ in range(0, meds_looted):
                     random_loot = random.choice(self.MEDS)
                     self.meds.append(random_loot)
                     loot.append(random_loot)
-                self.food_text.config(text=f"Food: {len(self.food)}")
+                self.food_text.configure(text=f"Food: {len(self.food)}")
             elif 50 <= things_looted < 75:
                 loot = self.random_food_drink(2, 2)
             elif 75 <= things_looted <= 100:
@@ -961,7 +996,6 @@ class GameStats:
                     loot.append(random_loot)
                     self.meds.append(random_loot)
                 loot = "Nothing"
-
 
         elif self.location_player == graphics.junkyard:
             things_looted = random.randint(1, 100)
@@ -991,14 +1025,13 @@ class GameStats:
         loot = str(loot)
         loot = loot.replace('[', '').replace(']', '').replace("'", "")
         if self.found_ammo:
-            loot_gained = Label(self.trader_window,
+            loot_gained = CTkLabel(self.trader_window,
                                 text=f"You have found {loot}\n{self.ammo_found} bullet(s), and ${self.money_found}",
-                                font=("Courier", 20), fg="white", bg="black")
+                                font=("Courier", 25))
         else:
-            loot_gained = Label(self.trader_window, text=f"You have found {loot}", font=("Courier", 20), fg="white",
-                                bg="black")
-        loot_gained.grid(column=0, row=0)
-        button = Button(self.trader_window, text="Alright", command=self.close_trader, font=50, width=15)
+            loot_gained = CTkLabel(self.trader_window, text=f"You have found {loot}", font=("Courier", 25))
+        loot_gained.grid(column=0, row=0, pady=15, padx=15)
+        button = CTkButton(self.trader_window, text="Alright", command=self.close_trader, font=Font_tuple, width=15)
         button.grid(column=0, row=1, pady=12)
         GameStats.game_over(self)
         GameStats.update_text(self)
@@ -1024,57 +1057,57 @@ class GameStats:
         energy_color = self.color_change.energy_change(self.energy)
         thirst_color = self.color_change.thirst_change(self.thirst)
         health_color = self.color_change.health_change(self.health)
-        self.thirst_number.config(text=f"Thirst: {self.thirst}", fg=thirst_color)
-        self.hunger_number.config(text=f"Hunger: {self.hunger}", fg=hunger_color)
-        self.energy_number.config(text=f"Energy: {self.energy}", fg=energy_color)
-        self.health_number.config(text=f"Health: {self.health}", fg=health_color)
-        self.days_number.config(text=f"Days Left: {self.days_left}")
-        self.ammo_have.config(text=f"Ammo: {self.ammo}")
-        self.money_number.config(text=f"Money: ${self.money}")
-        self.food_text.config(text=f"Food: {len(self.food)}")
-        self.drinks_text.config(text=f"Drinks: {len(self.drinks)}")
-        self.meds_text.config(text=f"Meds: {len(self.meds)}")
+        self.thirst_number.configure(text=f"Thirst: {self.thirst}", text_color=thirst_color)
+        self.hunger_number.configure(text=f"Hunger: {self.hunger}", text_color=hunger_color)
+        self.energy_number.configure(text=f"Energy: {self.energy}", text_color=energy_color)
+        self.health_number.configure(text=f"Health: {self.health}", text_color=health_color)
+        self.days_number.configure(text=f"Days Left: {self.days_left}")
+        self.ammo_have.configure(text=f"Ammo: {self.ammo}")
+        self.money_number.configure(text=f"Money: ${self.money}")
+        self.food_text.configure(text=f"Food: {len(self.food)}")
+        self.drinks_text.configure(text=f"Drinks: {len(self.drinks)}")
+        self.meds_text.configure(text=f"Meds: {len(self.meds)}")
 
         GameStats.game_over(self)
         if len(self.tools) == 0:
-            self.tools_owned.config(text=f"Tools: None", fg="white", font=('Helvetica 18 bold'))
+            self.tools_owned.configure(text=f"Tools: None",font=("Helvetica", 18, "bold"))
         else:
             tools_formatted = str(self.tools)
             tools_formatted = tools_formatted.replace('[', '').replace(']', '').replace("'", "")
-            self.tools_owned.config(text=f"Tools: {tools_formatted}")
+            self.tools_owned.configure(text=f"Tools: {tools_formatted}")
         if len(self.car_parts) == 0:
-            self.car_parts_text.config(text=f"Car Parts: None")
+            self.car_parts_text.configure(text=f"Car Parts: None")
         else:
             car_parts_formatted = str(self.car_parts)
             car_parts_formatted = car_parts_formatted.replace('[', '').replace(']', '').replace("'", "")
-            self.car_parts_text.config(text=f"Car Parts: {car_parts_formatted}")
+            self.car_parts_text.configure(text=f"Car Parts: {car_parts_formatted}")
 
     def game_over(self):
         if self.health <= 0 or self.days_left == -1:
             loot = str(self.parts_missing)
             loot = loot.replace('[', '').replace(']', '').replace("'", "")
             if self.days_left == -1:
-                retry_button = Button(self.trader_window, text="Restart Game", command=self.restart_game, font=('Helvetica 20 bold'))
+                retry_button = CTkButton(self.trader_window, text="Restart Game", command=self.restart_game, font=Font_tuple)
                 retry_button.grid(column=0, row=1)
                 exit_info = Label(self.canvas_bottom, text=f"You ran out of time and had the {loot} left to install.", bg="#113826",
-                                     font=('Helvetica 20 bold'), fg="white")
-                exit_info.grid(column=0, row=3)
+                                     font=('Helvetica 20 bold'), text_color="white")
+                exit_info.grid(column=0, row=3, pady=15, padx=10)
             else:
-                exit_info = Label(self.canvas_bottom, text=f"You died, you still had the {loot} left to install",font=('Helvetica 20 bold'), bg="#113826", fg="white")
-                exit_info.grid(column=0, row=3)
-            self.health_number.config(text=f"Health: 0", fg="red")
+                exit_info = Label(self.canvas_bottom, text=f"You died, you still had the {loot} left to install",font=('Helvetica 20 bold'), bg="#113826", fg="white", wraplength=620)
+                exit_info.grid(column=0, row=3, padx=10, pady=5)
+            self.health_number.configure(text=f"Health: 0", text_color="red")
             pygame.mixer.Channel(2).play(pygame.mixer.Sound("death1.ogg"))
             try:
                 self.trader_window.destroy()
             finally:
                 GameStats.delete_buttons(self)
-                self.days_number.config(text="You Lose")
-                exit_button = Button(self.canvas_bottom, text="Close Game", command=self.exit_game,
-                                     font=('Helvetica 20 bold'))
-                exit_button.grid(column=0, row=0)
-                retry_button = Button(self.canvas_bottom, text="Restart Game", command=self.restart_game,
-                                      font=('Helvetica 20 bold'))
-                retry_button.grid(column=0, row=1)
+                self.days_number.configure(text="You Lose")
+                exit_button = CTkButton(self.canvas_bottom, text="Close Game", command=self.exit_game,
+                                     font=Font_tuple)
+                exit_button.grid(column=0, row=0, pady=10)
+                retry_button = CTkButton(self.canvas_bottom, text="Restart Game", command=self.restart_game,
+                                      font=Font_tuple)
+                retry_button.grid(column=0, row=1, pady=15)
             try:
                 GameStats.close_trader(self)
                 GameStats.delete_buttons(self)
@@ -1100,37 +1133,44 @@ class GameStats:
         car_text = Label(self.trader_window, text=f"Missing parts\n{loot}", font=("Courier", 14),
                          fg="green", bg="black")
         car_text.grid(column=0, row=0)
-        button = Button(self.trader_window, text="Exit", command=self.close_trader, font=18)
+        button = CTkButton(self.trader_window, text="Exit", command=self.close_trader, font=Font_tuple)
         button.grid(column=0, row=1)
 
     def repair_car(self):
         if len(self.tools) >= 4 and len(self.car_parts) >= 1:
+            if self.car_parts[0] in self.parts_missing:
+                part_repaired = self.car_parts[0]
+            elif self.car_parts[1] in self.parts_missing:
+                part_repaired = self.car_parts[1]
+            else:
+                part_repaired = self.car_parts[2]
             self.create_center_window()
-            button = Button(self.trader_window, text="Exit", command=self.close_trader, font=18)
-            button.grid(column=0, row=1)
+            button = CTkButton(self.trader_window, text="Exit", command=self.close_trader, font=Font_tuple)
+            button.grid(row=1)
             pygame.mixer.Channel(1).play(pygame.mixer.Sound("repair1.mp3"))
             self.delete_buttons()
-            repaired_car_text = Label(self.trader_window, text=f"You installed the {self.car_parts[0]}",
+            repaired_car_text = Label(self.trader_window, text=f"You installed the {part_repaired}",
                                       font=("Courier", 14), fg="green", bg="black")
             repaired_car_text.grid(column=0, row=0)
-            self.parts_missing.remove(self.car_parts[0])
-            self.car_parts.remove(self.car_parts[0])
+            self.parts_missing.remove(part_repaired)
+            self.car_parts.remove(part_repaired)
+            if len(self.parts_missing) == 0:
+                pygame.mixer.Channel(2).play(pygame.mixer.Sound("car_start.mp3"))
+                self.days_number.configure(text="You are Winner!!")
+                retry_button = CTkButton(self.canvas_bottom, text="Restart Game", command=self.restart_game,
+                                      font=Font_tuple)
+                retry_button.grid(column=0, row=1, pady=15)
+                try:
+                    GameStats.close_trader(self)
+                    GameStats.delete_buttons(self)
+                except:
+                    None
             self.energy -= random.randint(10, 30)
             self.hunger -= random.randint(10, 25)
             self.thirst -= random.randint(10, 20)
             self.no_health_loss = False
             self.update_text()
             self.game_over()
-            if len(self.parts_missing) == 0:
-                pygame.mixer.Channel(2).play(pygame.mixer.Sound("car_start.mp3"))
-                self.days_number.config(text="You are Winner!!")
-                retry_button = Button(self.canvas_bottom, text="Restart Game", command=self.restart_game,
-                                      font=('Helvetica 20 bold'))
-                retry_button.grid(column=0, row=1)
-                try:
-                    GameStats.close_trader(self)
-                    GameStats.delete_buttons(self)
-                except:
-                    None
+
         else:
             messagebox.showinfo("Do not have all 4 tools", "You need all 4 tools or do not have a car part.")
