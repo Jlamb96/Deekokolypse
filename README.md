@@ -13,6 +13,6 @@ effectively. It's a fun and challenging game that will keep you on your toes!
 
 
 
-![Deek1](https://user-images.githubusercontent.com/103245650/232601571-518bca0a-1f02-4766-9a74-abe225fcb69e.png)
-![Deek2](https://user-images.githubusercontent.com/103245650/232601581-c89976e0-d9a1-4bde-9138-3f18753621ab.png)
-![deek3](https://user-images.githubusercontent.com/103245650/232601591-0b5b3f2d-d3d8-4aa8-b0fd-d39be551ed22.png)
+![image](https://user-images.githubusercontent.com/103245650/236603983-d1de0ee2-d92a-4543-9ad8-0a2bc04eeff3.png)
+![image](https://user-images.githubusercontent.com/103245650/236604056-8380d829-6f7c-4742-a55b-7ad57c9531bd.png)
+![image](https://user-images.githubusercontent.com/103245650/236604119-42bd9c9b-09b1-41f7-931d-9cc9e2a1bac7.png)
